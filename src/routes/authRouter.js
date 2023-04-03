@@ -1,14 +1,23 @@
 import { Router } from "express";
 import { validateSchema } from "../middlewares/schemaValidator.js";
 import signUpSchema from "../schemas/signUpSchema.js";
-import userController from "../controllers/authControllers.js";
-import userMiddleware from "../middlewares/authMiddleware.js";
+import signInSchema from "../schemas/signInSchema.js";
+import authController from "../controllers/authControllers.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
 const authRouter = Router();
 
 authRouter.post(
   "/signup",
   validateSchema(signUpSchema),
-  userMiddleware.signUpValidator,
-  userController.createUser
+  authMiddleware.signUpValidator,
+  authController.createUser
 );
+
+authRouter.post(
+  "/signin",
+  validateSchema(signInSchema),
+  authController.signInUser
+);
+
+export default { authRouter };

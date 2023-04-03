@@ -20,4 +20,16 @@ async function createUser(req, res) {
   }
 }
 
-export default { createUser }; 
+async function signInUser(req, res) {
+  const { email, password } = req.body;
+
+  try {
+    const token = await userServices.signInUser(email, password);
+
+    return re.send({ token });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export default { createUser, signInUser };

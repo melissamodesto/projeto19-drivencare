@@ -1,6 +1,7 @@
 import userRepository from "../repositories/userRepository.js";
 import doctorRepository from "../repositories/doctorRepository.js";
 import patientRepository from "../repositories/patienteRepository.js";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 async function createUser(name, email, password, type, speciality) {
@@ -42,4 +43,40 @@ async function createDoctor(user_id, speciality) {
   }
 }
 
-export default { createUser };
+async function createToken(email, password) {
+  const {
+    rows: [user],
+  } = await userRepository.findByEmail(email);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  if (!rowCount) errors.invalidCredentialsError();
+
+  const validPassword = await bcrypt.compare(password, user.password);
+
+  if (!validPassword) {
+    throw new Error("Invalid password");
+  }
+
+  const secretKey = await findSecretKey();
+
+  if (!secretKey) throw new Error("Secret key not found");
+
+  const token = jwt.sign({ userId: user.id }, secretKey, {
+    expiresIn: "1h",
+  });
+
+  return token;
+}
+
+async function findSecretKey() {
+  const secretKey = process.env.SECRET_KEY;
+  if (!secretKey) {
+    throw errors.notFoundError();
+  }
+  return secretKey;
+}
+
+export default { createUser, createToken, findSecretKey };
